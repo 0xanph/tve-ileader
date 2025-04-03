@@ -54,14 +54,13 @@ st.markdown(custom_css, unsafe_allow_html=True)
 @st.cache_data
 def load_and_combine_data():
     """
-    Đọc file CSV kết hợp (đã được tạo ra từ full_extract1 và extended_extract)
-    và loại bỏ các bản ghi trùng lặp dựa trên các cột khóa:
-    "Tên", "class_id", "Tên Lớp", "start_date", "end_date".
+    Reads the combined Parquet file and drops duplicate enrollment records
+    based on the key columns: "Tên", "class_id", "Tên Lớp", "start_date", "end_date".
     """
     try:
-        df = pd.read_csv("combined_extract.csv", low_memory=False)
+        df = pd.read_parquet("combined_extract.parquet", engine="pyarrow")
     except Exception as e:
-        st.error(f"Lỗi khi tải file CSV: {e}")
+        st.error(f"Lỗi khi tải file Parquet: {e}")
         return pd.DataFrame()
     dedup_columns = ["Tên", "class_id", "Tên Lớp", "start_date", "end_date"]
     df = df.drop_duplicates(subset=dedup_columns)
